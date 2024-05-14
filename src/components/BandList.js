@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 
-const BandList = ({ data, vote }) => {
+const BandList = ({ data, vote, deleteBand, newName }) => {
 
     const [bands, setBands] = useState(data);
 
@@ -19,12 +19,8 @@ const BandList = ({ data, vote }) => {
     }
 
     const onfocused = (id, name) => {
-        console.log(id, name);
+        newName(id, name);
     }
-
-    // const vote = (id) => {
-    //     Socket.emit( 'voteBand', id );
-    // }
 
     const createRows = () => {
         return (
@@ -50,7 +46,10 @@ const BandList = ({ data, vote }) => {
                         <h3>{band.votes}</h3>
                     </td>
                     <td>
-                        <button className='btn btn-danger'>
+                        <button 
+                            className='btn btn-danger'
+                            onClick={() => deleteBand(band.id)}
+                        >
                             borrar
                         </button>
                     </td>
