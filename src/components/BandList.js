@@ -1,12 +1,19 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
+import { SocketContext } from '../context/SocketContext';
 
-const BandList = ({ data, vote, deleteBand, newName }) => {
+const BandList = () => {
 
-    const [bands, setBands] = useState(data);
+    const [bands, setBands] = useState([]);
+
+    const { socket } = useContext(SocketContext);
 
     useEffect(() => {
-        setBands(data)
-    }, [data]);
+        socket.on('currentBands', (bands) => {
+            setBands(bands)
+        })
+        return () => socket.off('currentBands');
+    }, [socket]);
+
 
     const changeName = (e, id) => {
         const newName = e.target.value;
@@ -19,8 +26,18 @@ const BandList = ({ data, vote, deleteBand, newName }) => {
     }
 
     const onfocused = (id, name) => {
-        newName(id, name);
+        socket.emit('changName', {
+            id, name
+        });
     }
+
+    const vote = (id) => {
+        socket.emit('voteBand', id);
+    }
+
+  const deleteBand = (id) => {
+    socket.emit('delBand', id);
+  }
 
     const createRows = () => {
         return (
@@ -31,7 +48,7 @@ const BandList = ({ data, vote, deleteBand, newName }) => {
                     <td>
                         <button
                             className="btn btn-primary"
-                            onClick={() => vote(band.id)}
+                            onClick={() => vote(band.id) }
                         > +1 </button>
                     </td>
                     <td>
@@ -46,7 +63,7 @@ const BandList = ({ data, vote, deleteBand, newName }) => {
                         <h3>{band.votes}</h3>
                     </td>
                     <td>
-                        <button 
+                        <button
                             className='btn btn-danger'
                             onClick={() => deleteBand(band.id)}
                         >
@@ -57,7 +74,6 @@ const BandList = ({ data, vote, deleteBand, newName }) => {
             ))
         );
     }
-
 
     return (
         <>
